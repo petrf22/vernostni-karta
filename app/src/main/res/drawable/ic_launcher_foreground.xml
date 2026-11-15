@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- card -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M33,36h42a6,6 0,0 1,6 6v24a6,6 0,0 1,-6 6h-42a6,6 0,0 1,-6 -6v-24a6,6 0,0 1,6 -6z" />
+    <!-- barcode -->
+    <path
+        android:fillColor="#004D40"
+        android:pathData="M34,44h3v20h-3zM39,44h1.5v20h-1.5zM43,44h4v20h-4zM49,44h1.5v20h-1.5zM52.5,44h3v20h-3zM58,44h1.5v20h-1.5zM61.5,44h4v20h-4zM67.5,44h1.5v20h-1.5zM71,44h3v20h-3z" />
+</vector>
