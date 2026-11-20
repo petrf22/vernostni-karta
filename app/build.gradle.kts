@@ -1,4 +1,5 @@
 import com.android.build.api.artifact.SingleArtifact
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -19,10 +20,39 @@ android {
         versionName = "1.0.0"
     }
 
+    // Upload key: keystore.properties (local) or environment variables (CI). Without either,
+    // the release build is simply left unsigned.
+    val keystoreProps = Properties().apply {
+        rootProject.file("keystore.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+    }
+    fun signingValue(prop: String, env: String): String? =
+        keystoreProps.getProperty(prop) ?: System.getenv(env)
+
+    val releaseStoreFile = signingValue("storeFile", "KEYSTORE_FILE")
+    signingConfigs {
+        if (releaseStoreFile != null) {
+            create("release") {
+                storeFile = rootProject.file(releaseStoreFile)
+                storePassword = signingValue("storePassword", "KEYSTORE_PASSWORD")
+                keyAlias = signingValue("keyAlias", "KEY_ALIAS")
+                keyPassword = signingValue("keyPassword", "KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfigs.findByName("release")?.let { signingConfig = it }
         }
+    }
+
+    // No dependency metadata in the APK/AAB (not needed, and it is a fingerprint of the build).
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 
     compileOptions {
