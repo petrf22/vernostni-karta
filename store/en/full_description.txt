@@ -1,0 +1,12 @@
+Leave the stack of plastic cards at home. Loyalty Card keeps all your store cards in your phone and shows the barcode at the checkout.
+
+• Add a card by scanning it with the camera or from an image, or type the number in.
+• Large, high-contrast code with automatically raised screen brightness, so the cashier's scanner reads it at once.
+• Search the list and arrange the cards by drag and drop.
+• Nearby (optional, off by default): offers first the cards you use near your current position. The location stays on the device.
+• Back up and restore everything as a file (export and import).
+
+PRIVATE BY DESIGN
+The app has no internet permission at all, so it cannot send anything anywhere. There are no ads, no analytics and no accounts. Your cards stay on your device and leave it only when you export them yourself.
+
+Free and open source (GPLv3): https://github.com/petrf22/vernostni-karta

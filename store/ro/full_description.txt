@@ -1,0 +1,12 @@
+Lasă grămada de carduri de plastic acasă. Card de fidelitate păstrează toate cardurile tale de magazin în telefon și afișează codul de bare la casă.
+
+• Adaugi un card scanându-l cu camera sau dintr-o imagine, ori introducând numărul manual.
+• Cod mare, cu contrast ridicat, cu luminozitatea ecranului crescută automat, ca scannerul de la casă să îl citească imediat.
+• Căutare în listă și ordonarea cardurilor prin tragere.
+• În apropiere (opțional, dezactivat implicit): îți oferă primele cardurile pe care le folosești lângă poziția ta curentă. Locația rămâne pe dispozitiv.
+• Copie de rezervă și restaurare pentru tot, într-un fișier (export și import).
+
+CONFIDENȚIALITATE ÎNAINTE DE TOATE
+Aplicația nu are deloc permisiunea de internet, deci nu poate trimite nimic nicăieri. Fără reclame, fără analiză și fără conturi. Cardurile tale rămân pe dispozitiv și îl părăsesc doar atunci când le exporți chiar tu.
+
+Gratuită și open source (GPLv3): https://github.com/petrf22/vernostni-karta

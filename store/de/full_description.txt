@@ -1,0 +1,12 @@
+Lassen Sie den Stapel Plastikkarten zu Hause. Die Kundenkarte speichert alle Ihre Karten im Smartphone und zeigt an der Kasse den Barcode an.
+
+• Karten per Kamera oder aus einem Bild einscannen oder die Nummer von Hand eingeben.
+• Großer, kontrastreicher Code mit automatisch erhöhter Bildschirmhelligkeit, damit der Scanner an der Kasse ihn sofort liest.
+• Suche in der Liste und Sortieren der Karten per Drag-and-drop.
+• In der Nähe (optional, standardmäßig aus): zeigt zuerst die Karten, die Sie nahe Ihrem aktuellen Standort verwenden. Der Standort bleibt auf dem Gerät.
+• Alles als Datei sichern und wiederherstellen (Export und Import).
+
+DATENSCHUTZ VON GRUND AUF
+Die App hat überhaupt keine Internetberechtigung und kann daher nichts irgendwohin senden. Keine Werbung, keine Analyse, keine Konten. Ihre Karten bleiben auf dem Gerät und verlassen es nur, wenn Sie sie selbst exportieren.
+
+Kostenlos und Open Source (GPLv3): https://github.com/petrf22/vernostni-karta

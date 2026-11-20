@@ -1,0 +1,12 @@
+Hagyja otthon a műanyag kártyák halmát. A Törzskártya a telefonjában tartja az összes bolti kártyáját, és a pénztárnál megjeleníti a vonalkódot.
+
+• Kártyát felvehet a kamerával vagy képből beolvasva, illetve a számot kézzel beírva.
+• Nagy, kontrasztos kód automatikusan megemelt képernyőfényerővel, hogy a pénztári olvasó azonnal beolvassa.
+• Keresés a listában és a kártyák sorrendjének módosítása húzással.
+• A közelben (opcionális, alapból kikapcsolva): elöl kínálja azokat a kártyákat, amelyeket a jelenlegi helyzete közelében használ. A helyadat az eszközön marad.
+• Minden adat mentése és visszaállítása fájlba (export és import).
+
+ALAPBÓL PRIVÁT
+Az alkalmazásnak egyáltalán nincs internet-engedélye, ezért semmit nem tud sehová elküldeni. Nincsenek hirdetések, elemzések és fiókok. A kártyái az eszközén maradnak, és csak akkor hagyják el, ha Ön exportálja őket.
+
+Ingyenes és nyílt forráskódú (GPLv3): https://github.com/petrf22/vernostni-karta

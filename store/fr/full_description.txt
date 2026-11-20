@@ -1,0 +1,12 @@
+Laissez la pile de cartes en plastique à la maison. Carte de fidélité garde toutes vos cartes de magasin dans votre téléphone et affiche le code-barres en caisse.
+
+• Ajoutez une carte en la scannant avec l’appareil photo ou depuis une image, ou saisissez le numéro à la main.
+• Grand code très contrasté, avec la luminosité de l’écran augmentée automatiquement, pour que le lecteur de la caisse le lise tout de suite.
+• Recherche dans la liste et classement des cartes par glisser-déposer.
+• À proximité (facultatif, désactivé par défaut) : propose en premier les cartes que vous utilisez près de votre position actuelle. La position reste sur l’appareil.
+• Sauvegarde et restauration de tout dans un fichier (export et import).
+
+PRIVÉ PAR CONCEPTION
+L’application n’a aucune autorisation Internet : elle ne peut donc rien envoyer nulle part. Pas de publicité, pas d’analyse, pas de compte. Vos cartes restent sur votre appareil et ne le quittent que lorsque vous les exportez vous-même.
+
+Gratuite et open source (GPLv3): https://github.com/petrf22/vernostni-karta

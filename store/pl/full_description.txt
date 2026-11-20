@@ -1,0 +1,12 @@
+Zostaw stos plastikowych kart w domu. Karta lojalnościowa trzyma wszystkie Twoje karty sklepowe w telefonie i pokazuje kod kreskowy przy kasie.
+
+• Kartę dodasz, skanując ją aparatem lub z obrazu, albo wpisując numer ręcznie.
+• Duży, kontrastowy kod z automatycznie zwiększoną jasnością ekranu, aby czytnik przy kasie odczytał go od razu.
+• Wyszukiwanie na liście i ustawianie kolejności kart przeciąganiem.
+• W pobliżu (opcjonalnie, domyślnie wyłączone): na początku pokazuje karty, których używasz blisko swojej pozycji. Lokalizacja zostaje na urządzeniu.
+• Kopia zapasowa i przywracanie wszystkiego do pliku (eksport i import).
+
+PRYWATNOŚĆ PRZEDE WSZYSTKIM
+Aplikacja w ogóle nie ma uprawnienia do internetu, więc nie może niczego nigdzie wysłać. Brak reklam, analityki i kont. Twoje karty zostają na urządzeniu i opuszczają je tylko wtedy, gdy sam je wyeksportujesz.
+
+Za darmo i open source (GPLv3): https://github.com/petrf22/vernostni-karta

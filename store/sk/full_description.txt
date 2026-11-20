@@ -1,0 +1,12 @@
+Nechajte kopu plastových kariet doma. Vernostná karta drží všetky vaše obchodné karty v telefóne a na pokladni ukáže čiarový kód.
+
+• Kartu pridáte naskenovaním kamerou alebo z obrázka, prípadne prepíšete číslo ručne.
+• Veľký kontrastný kód s automaticky zvýšeným jasom displeja, aby ho čítačka na pokladni prečítala hneď.
+• Vyhľadávanie v zozname a radenie kariet presúvaním.
+• V blízkosti (voliteľné, predvolene vypnuté): ponúkne ako prvé karty, ktoré používate blízko svojej polohy. Poloha zostáva v zariadení.
+• Záloha a obnova všetkého do súboru (export a import).
+
+SÚKROMIE PREDOVŠETKÝM
+Aplikácia nemá vôbec oprávnenie na internet, takže nemôže nič nikam odoslať. Žiadne reklamy, analytika ani účty. Vaše karty zostávajú v zariadení a opustia ho len vtedy, keď ich sami exportujete.
+
+Zadarmo a open source (GPLv3): https://github.com/petrf22/vernostni-karta

@@ -1,0 +1,12 @@
+Deja el montón de tarjetas de plástico en casa. Tarjeta de fidelidad guarda todas tus tarjetas de tiendas en el móvil y muestra el código de barras en la caja.
+
+• Añade una tarjeta escaneándola con la cámara o desde una imagen, o escribe el número a mano.
+• Código grande y de alto contraste con el brillo de la pantalla aumentado automáticamente, para que el lector de la caja lo lea al instante.
+• Busca en la lista y ordena las tarjetas arrastrándolas.
+• Cerca (opcional, desactivado por defecto): ofrece primero las tarjetas que usas cerca de tu posición actual. La ubicación se queda en el dispositivo.
+• Copia de seguridad y restauración de todo en un archivo (exportar e importar).
+
+PRIVADA DESDE EL DISEÑO
+La aplicación no tiene ningún permiso de internet, así que no puede enviar nada a ninguna parte. Sin anuncios, sin analíticas y sin cuentas. Tus tarjetas permanecen en tu dispositivo y solo salen de él cuando las exportas tú.
+
+Gratuita y de código abierto (GPLv3): https://github.com/petrf22/vernostni-karta
