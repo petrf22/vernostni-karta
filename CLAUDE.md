@@ -27,6 +27,15 @@ python3 tools/i18n/strings.py       # přegeneruje strings.xml všech jazyků
 AGP 9 má Kotlin vestavěný — plugin `org.jetbrains.kotlin.android` nepřidávat. `compileSdk 37`,
 `targetSdk 36`, `minSdk 26`. Verze knihoven jsou v `gradle/libs.versions.toml`.
 
+## Google Play
+
+Postup publikace je v `docs/PLAY_STORE.md`. Složka `store/<lang>/` je **generovaná**: ikona a
+feature graphic z `tools/store/graphics.py`, texty z `tools/store/listing.py` (tabulka textů
+a kontrola limitů 30/80/4000 znaků je v něm), screenshoty se pořizují v emulátoru. Release se
+podepisuje z `keystore.properties` nebo z env `KEYSTORE_*` (v gitu není); před každým nahráním
+zvyš `versionCode`. `PRIVACY.md` musí odpovídat chování aplikace — při změně práce s polohou,
+kamerou nebo exportem ho uprav.
+
 ## Texty a jazyky
 
 `app/src/main/res/values*/strings.xml` jsou **generované** — needituj je. Zdroj je tabulka
