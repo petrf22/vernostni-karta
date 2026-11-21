@@ -6,7 +6,7 @@ Formát vychází z [Keep a Changelog](https://keepachangelog.com/cs/), verze po
 [`docs/PLAY_STORE.md`](docs/PLAY_STORE.md). Nové změny zapisuj do sekce `[Nezveřejněno]`,
 každou položku na jeden řádek.
 
-## [Nezveřejněno]
+## [1.0.0] – 2026-11-21
 
 ### Přidáno
 - Seznam věrnostních karet s hledáním a řazením přetažením
