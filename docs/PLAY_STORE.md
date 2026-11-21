@@ -13,7 +13,7 @@ aktuální požadavky (zejména minimální `targetSdk` a podmínky testování 
 | Název, krátký a dlouhý popis | `store/<lang>/{title,short_description,full_description}.txt` | `python3 tools/store/listing.py` (texty jsou v tom skriptu, kontroluje limity 30/80/4000) |
 | Screenshoty telefonu | `store/<lang>/images/phoneScreenshots/*.png` | viz sekce „Screenshoty“ |
 | Privacy policy | `PRIVACY.md` | ručně |
-| Release AAB | `app/build/outputs/bundle/release/app-release.aab` | `./gradlew :app:bundleRelease` |
+| Podepsaný AAB | `~/releases/vernostnikarta/vX.Y.Z/app-release.aab` | `/release-vernostni-karta` (viz „Vydání verze“) |
 
 `<lang>` je `en cs sk pl hu ro de es fr`. V Play Console je to: en → *English – en-US*,
 cs → *Czech – cs-CZ*, sk → *Slovak*, pl → *Polish*, hu → *Hungarian*, ro → *Romanian*,
@@ -23,44 +23,63 @@ Soubory `store/**` se po změně textů/ikony přegenerují těmi skripty; needi
 
 ## 1. Upload klíč (jednou)
 
-Příkaz spusťte v terminálu sami (zadáte hesla). Soubor ani hesla nikdy nedávejte do gitu.
+Stejný vzor jako u ostatních aplikací (kvalita-cena). Příkaz spusťte v terminálu sami (zadáte
+hesla); soubor ani hesla nikdy nejdou do repa (`.gitignore`: `*.jks`, `*.keystore`).
 
 ```bash
-keytool -genkeypair -v -keystore ~/vernostni-karta-upload.jks -alias upload \
-  -keyalg RSA -keysize 4096 -validity 10000
+mkdir -p ~/.keystores
+keytool -genkeypair -v -keystore ~/.keystores/vernostnikarta-release.jks \
+  -alias vernostnikarta -keyalg RSA -keysize 4096 -validity 12000
 ```
 
-Do kořene repa vytvořte `keystore.properties` (je v `.gitignore`):
+Do `~/.gradle/gradle.properties` přidejte:
 
 ```properties
-storeFile=/home/petr/vernostni-karta-upload.jks
-storePassword=...
-keyAlias=upload
-keyPassword=...
+VERNOSTNIKARTA_STORE_FILE=/home/petr/.keystores/vernostnikarta-release.jks
+VERNOSTNIKARTA_STORE_PASSWORD=...
+VERNOSTNIKARTA_KEY_ALIAS=vernostnikarta
+VERNOSTNIKARTA_KEY_PASSWORD=...
 ```
 
-Pro CI lze místo souboru použít proměnné `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`,
-`KEY_PASSWORD`. Keystore si zálohujte mimo počítač. V Play Console nechte zapnuté
-**Play App Signing** (výchozí); klíč, který držíte vy, je pouze *upload key* a při ztrátě se dá
-na žádost resetovat.
+`app/build.gradle.kts` je čte přes `findProperty`. Chybí-li kterákoli, `bundleRelease` vyrobí
+nepodepsaný AAB (CI, cizí stroj); pro Play se proto staví `./gradlew :app:publishableBundle`,
+který bez klíče **selže** a hotový AAB ověří jarsignerem. Keystore zálohujte mimo tento počítač.
+V Play Console nechte zapnuté **Play App Signing**; váš klíč je pak jen *upload key*.
 
-## 2. Sestavení
+Otisk klíče (pro registraci balíčku v Play Console, viz níže):
 
 ```bash
-./gradlew check :app:bundleRelease
+keytool -list -v -keystore ~/.keystores/vernostnikarta-release.jks -alias vernostnikarta | grep SHA256
 ```
 
-Před každým dalším nahráním zvyšte `versionCode` v `app/build.gradle.kts` (Play nepřijme stejný
-dvakrát) a podle potřeby `versionName`. Release je minifikovaný (R8); před nahráním ho
-nainstalujte a projděte skener, detail, export a import.
+## 2. Vydání verze
 
-## 3. Účet a nová aplikace
+Verze je v kořenovém souboru `VERSION` (`X.Y.Z`); `versionName` je přímo ona a
+`versionCode = X·10000 + Y·100 + Z` (1.0.0 → 10000), obojí počítá `app/build.gradle.kts`.
+Změny se během vývoje zapisují do `CHANGELOG.md`, sekce `[Nezveřejněno]`.
 
-1. https://play.google.com/console → účet vývojáře (jednorázově 25 USD, ověření identity).
-   U osobního účtu vytvořeného po listopadu 2023 Google vyžaduje před produkcí **closed test**
-   (v době psaní: min. 12 testerů, 14 dní nepřetržitě) — ověřte aktuální stav v konzoli.
-2. **Create app**: název *Loyalty Card*, výchozí jazyk *English (United States)*, typ *App*,
+Vydání dělá Claude Code skill **`/release-vernostni-karta [X.Y.Z|major|minor|patch]`**
+(`.claude/skills/release-vernostni-karta/SKILL.md`): uzavře sekci changelogu, povýší `VERSION`,
+pošle PR `release/X.Y.Z` (main je chráněný, jen přes PR), po vašem potvrzení ho smerguje,
+otaguje `vX.Y.Z`, sestaví z tagu ve worktree `check` + `publishableBundle` a uloží
+`app-release.aab` a `mapping.txt` do `~/releases/vernostnikarta/vX.Y.Z/`. Nakonec vypíše
+poznámky k vydání v devíti jazycích s tagy Play Console. První vydání (bez tagu) použije
+verzi z `VERSION` tak, jak je (1.0.0).
+
+Release je minifikovaný (R8); před prvním nahráním do produkce ho nainstalujte (internal
+testing) a projděte skener, detail, export a import.
+
+## 3. Nová aplikace v Play Console
+
+Účet vývojáře už existuje (jsou na něm jiné aplikace), takže stačí:
+
+1. **Create app**: název *Loyalty Card*, výchozí jazyk *English (United States)*, typ *App*,
    *Free*, odsouhlasit deklarace.
+2. Pokud konzole u balíčku chce **registraci / ověření vlastnictví** (Android developer
+   verification), zadejte `io.github.petrf22.vernostnikarta` a SHA-256 otisk klíče z příkazu
+   výše. `applicationId` je pak napořád.
+3. U osobního účtu Google může před produkcí vyžadovat **closed test** (v době psaní 12 testerů
+   po 14 dní, platí pro účty založené po listopadu 2023) — stav je vidět v *Dashboard*.
 
 ## 4. Store listing
 
@@ -94,8 +113,9 @@ nainstalujte a projděte skener, detail, export a import.
 
 ## 6. Nahrání a vydání
 
-1. *Testing → Internal testing → Create new release* → nahrát `app-release.aab`, vyplnit
-   *Release notes* (např. „První verze.“), uložit a vydat. Přidejte sebe jako testera
+1. *Testing → Internal testing → Create new release* → nahrát
+   `~/releases/vernostnikarta/vX.Y.Z/app-release.aab`, do *Release notes* vložit blok, který
+   vypíše `/release-vernostni-karta`, uložit a vydat. Přidejte sebe jako testera
    a nainstalujte z odkazu — ověříte, že AAB funguje a podpis sedí.
 2. Pro osobní účet: *Closed testing* s testery a po splnění podmínky *Apply for production*.
 3. *Production → Create new release* → stejný nebo novější AAB → *Send for review*.

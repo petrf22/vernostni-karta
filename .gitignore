@@ -11,7 +11,6 @@ captures/
 *.aab
 *.jks
 *.keystore
-keystore.properties
 .DS_Store
 
 # Dex pro dump všech oken, ui.py ho sestaví sám z WindowDump.java
