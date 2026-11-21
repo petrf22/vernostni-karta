@@ -31,10 +31,15 @@ AGP 9 má Kotlin vestavěný — plugin `org.jetbrains.kotlin.android` nepřidá
 
 Postup publikace je v `docs/PLAY_STORE.md`. Složka `store/<lang>/` je **generovaná**: ikona a
 feature graphic z `tools/store/graphics.py`, texty z `tools/store/listing.py` (tabulka textů
-a kontrola limitů 30/80/4000 znaků je v něm), screenshoty se pořizují v emulátoru. Release se
-podepisuje z `keystore.properties` nebo z env `KEYSTORE_*` (v gitu není); před každým nahráním
-zvyš `versionCode`. `PRIVACY.md` musí odpovídat chování aplikace — při změně práce s polohou,
-kamerou nebo exportem ho uprav.
+a kontrola limitů 30/80/4000 znaků je v něm), screenshoty se pořizují v emulátoru. `PRIVACY.md` musí odpovídat
+chování aplikace — při změně práce s polohou, kamerou nebo exportem ho uprav.
+
+Verze je v kořenovém `VERSION`; `versionName`/`versionCode` z něj počítá `app/build.gradle.kts`
+— needituj je v buildu. Uživatelsky viditelné změny zapisuj do `CHANGELOG.md`, sekce
+`[Nezveřejněno]`, jedna položka na řádek. Vydání dělá `/release-vernostni-karta`
+(`.claude/skills/`); podpis bere z `VERNOSTNIKARTA_*` v `~/.gradle/gradle.properties`
+a pro Play se staví `:app:publishableBundle`, ne `bundleRelease` (ten bez klíče tiše vyrobí
+nepodepsaný AAB). `main` je chráněný rulesetem — změny jen přes PR.
 
 ## Texty a jazyky
 

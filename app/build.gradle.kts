@@ -1,5 +1,6 @@
 import com.android.build.api.artifact.SingleArtifact
-import java.util.Properties
+import java.io.ByteArrayOutputStream
+import javax.inject.Inject
 
 plugins {
     alias(libs.plugins.android.application)
@@ -7,6 +8,29 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
+
+// Version: the root VERSION file (X.Y.Z) is the single source of truth, CHANGELOG.md describes it.
+// versionCode is derived from it, so a release only ever edits VERSION and CHANGELOG.md.
+val appVersion = rootProject.file("VERSION").readText().trim()
+val appVersionCode = run {
+    val parts = appVersion.split(".").map { it.toIntOrNull() }
+    require(parts.size == 3 && parts.all { it != null && it in 0..99 }) {
+        "VERSION must be X.Y.Z with each part 0..99, found '$appVersion'"
+    }
+    val (major, minor, patch) = parts.map { it!! }
+    major * 10000 + minor * 100 + patch
+}
+
+// Upload key from Gradle properties (~/.gradle/gradle.properties or -P), never stored in the repo.
+// If any value is missing, no signingConfig is created and bundleRelease builds an unsigned AAB
+// (CI, other machines). Anything that goes to Google Play is built with :app:publishableBundle,
+// which fails without the key instead.
+val releaseStoreFile = findProperty("VERNOSTNIKARTA_STORE_FILE") as String?
+val releaseStorePassword = findProperty("VERNOSTNIKARTA_STORE_PASSWORD") as String?
+val releaseKeyAlias = findProperty("VERNOSTNIKARTA_KEY_ALIAS") as String?
+val releaseKeyPassword = findProperty("VERNOSTNIKARTA_KEY_PASSWORD") as String?
+val hasReleaseSigning = releaseStoreFile != null && releaseStorePassword != null &&
+    releaseKeyAlias != null && releaseKeyPassword != null
 
 android {
     namespace = "io.github.petrf22.vernostnikarta"
@@ -16,26 +40,17 @@ android {
         applicationId = "io.github.petrf22.vernostnikarta"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = appVersionCode
+        versionName = appVersion
     }
 
-    // Upload key: keystore.properties (local) or environment variables (CI). Without either,
-    // the release build is simply left unsigned.
-    val keystoreProps = Properties().apply {
-        rootProject.file("keystore.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
-    }
-    fun signingValue(prop: String, env: String): String? =
-        keystoreProps.getProperty(prop) ?: System.getenv(env)
-
-    val releaseStoreFile = signingValue("storeFile", "KEYSTORE_FILE")
     signingConfigs {
-        if (releaseStoreFile != null) {
+        if (hasReleaseSigning) {
             create("release") {
-                storeFile = rootProject.file(releaseStoreFile)
-                storePassword = signingValue("storePassword", "KEYSTORE_PASSWORD")
-                keyAlias = signingValue("keyAlias", "KEY_ALIAS")
-                keyPassword = signingValue("keyPassword", "KEY_PASSWORD")
+                storeFile = file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
             }
         }
     }
@@ -45,7 +60,9 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfigs.findByName("release")?.let { signingConfig = it }
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
@@ -143,4 +160,93 @@ androidComponents {
         }
         tasks.named("check") { dependsOn(task) }
     }
+}
+
+// ---- Publishing: a signed and VERIFIED bundle for Google Play (docs/PLAY_STORE.md). Unlike
+// bundleRelease, publishableBundle fails without the upload key, before the slow R8 build. ----
+
+val checkReleaseSigning = tasks.register("checkReleaseSigning") {
+    group = "publishing"
+    description = "Fails unless all VERNOSTNIKARTA_* signing properties are set and the keystore exists."
+    val missing = listOfNotNull(
+        "VERNOSTNIKARTA_STORE_FILE".takeIf { releaseStoreFile == null },
+        "VERNOSTNIKARTA_STORE_PASSWORD".takeIf { releaseStorePassword == null },
+        "VERNOSTNIKARTA_KEY_ALIAS".takeIf { releaseKeyAlias == null },
+        "VERNOSTNIKARTA_KEY_PASSWORD".takeIf { releaseKeyPassword == null },
+    )
+    val storeFilePath = releaseStoreFile
+    val storeFileExists = releaseStoreFile?.let { file(it).isFile } ?: false
+    doLast {
+        if (missing.isNotEmpty()) {
+            throw GradleException(
+                "Missing signing properties in ~/.gradle/gradle.properties: ${missing.joinToString()} " +
+                    "(see docs/PLAY_STORE.md, \"Upload klíč\")."
+            )
+        }
+        if (!storeFileExists) {
+            throw GradleException("VERNOSTNIKARTA_STORE_FILE ('$storeFilePath') is not an existing file.")
+        }
+    }
+    // Cheap check; never "up to date", that could hide a keystore that has disappeared.
+    outputs.upToDateWhen { false }
+}
+
+/**
+ * Verifies the AAB signature. Bundles are jar-signed, so the tool is jarsigner (apksigner cannot
+ * read an AAB). `-strict` is not usable with a self-signed upload key, so the output is checked
+ * for "jar verified" instead.
+ */
+abstract class VerifyJarSignatureTask : DefaultTask() {
+    @get:InputFile
+    abstract val artifact: RegularFileProperty
+
+    @get:Internal
+    abstract val jarsigner: RegularFileProperty
+
+    @get:Inject
+    abstract val execOperations: ExecOperations
+
+    @TaskAction
+    fun verify() {
+        val output = ByteArrayOutputStream()
+        val result = execOperations.exec {
+            commandLine(
+                jarsigner.get().asFile.absolutePath, "-verify", "-verbose:summary", "-certs",
+                artifact.get().asFile.absolutePath,
+            )
+            standardOutput = output
+            errorOutput = output
+            isIgnoreExitValue = true
+        }
+        val text = output.toString()
+        if (result.exitValue != 0 || !text.contains("jar verified")) {
+            throw GradleException("${artifact.get().asFile.name} is not validly signed:\n$text")
+        }
+        logger.lifecycle("Signature verified: ${artifact.get().asFile.name}")
+    }
+}
+
+// jarsigner from the same JDK toolchain the app is built with (jvmToolchain(17) above).
+val jarsignerPath = project.extensions.getByType(JavaToolchainService::class.java).launcherFor {
+    languageVersion.set(JavaLanguageVersion.of(17))
+}.map { it.metadata.installationPath.file("bin/jarsigner") }
+
+val verifyBundleSignature = tasks.register<VerifyJarSignatureTask>("verifyBundleSignature") {
+    group = "publishing"
+    description = "Verifies the signature of app/build/outputs/bundle/release/app-release.aab."
+    artifact.set(layout.buildDirectory.file("outputs/bundle/release/app-release.aab"))
+    jarsigner.set(jarsignerPath)
+    dependsOn("bundleRelease")
+}
+
+// bundleRelease is registered by AGP later; afterEvaluate guarantees it exists here.
+afterEvaluate {
+    tasks.named("bundleRelease") { mustRunAfter(checkReleaseSigning) }
+}
+
+tasks.register("publishableBundle") {
+    group = "publishing"
+    description = "Signed and verified AAB for Google Play; unlike bundleRelease it fails without the key."
+    dependsOn(checkReleaseSigning, "bundleRelease", verifyBundleSignature)
+    doLast { logger.lifecycle("Version $appVersion, versionCode $appVersionCode") }
 }
